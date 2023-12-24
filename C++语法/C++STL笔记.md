@@ -150,7 +150,7 @@ deque是⼀个双端开口的连续线性空间，其内部为分段连续的空
 
 deque可以在头部或尾端加入新的空间，避免了vector的“重新配置，复制，释放”的轮回，维护连整体连续的假象，并提供随机访问的接口。不过这样也导致了其迭代器的复杂性。
 
-![image-20231211124845313](C:\Users\Vica\AppData\Roaming\Typora\typora-user-images\image-20231211124845313.png)
+![image-20231211124845313-1703423259516-5](image-20231211124845313-1703423259516-5.png)
 
 deque采用一块map（指的是一段连续的内存空间，不是std::map）作为控制中心，其中的每个元素都是指针，指向另一片连续线性空间，称为缓冲区，这个区才是用来储存数据的。
 
@@ -164,7 +164,7 @@ deque的插入和删除操作相比vector效率要更高，但访问速度上相
 
 栈与队列被称之为duque的配接器，其底层是以deque为底部架构。通过deque执⾏具体操作。
 
-![image-20231211125639407](C:\Users\Vica\AppData\Roaming\Typora\typora-user-images\image-20231211125639407.png)
+![image-20231211125639407](image-20231211125639407.png)
 
 以queue为例，在以deque为底层实现时，它的push方法本质就是deque中的push_back，并且它不提供pop_back方法。
 

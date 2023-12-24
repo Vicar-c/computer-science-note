@@ -52,7 +52,7 @@ C++ 保证出现在派生类中的基类子对象保持其原样，即基类子�
 
 虚继承主要用来解决钻石继承（或菱形继承）带来的问题，比如标准库中的IO类：
 
-<img src="C:\Users\Vica\AppData\Roaming\Typora\typora-user-images\image-20231207151439606.png" alt="image-20231207151439606" style="zoom:100%;" />
+![image-20231207151439606](image-20231207151439606.png)
 
 读写函数（istream/ostream）显然需要在一个base_ios中进行管理，不能包含两份base_ios子对象（注意这里的base_ios是基类，我们实现的是iostream），否则会出现引用不清晰问题（一个实现类下包含两个同名的基类）
 
@@ -115,7 +115,7 @@ C++通过虚函数表（vtable）支持虚函数机制，每个含有虚函数�
 
 ​	3.类自己定义的纯虚函数（纯虚函数的继承一定会被override）的表项指向一个默认处理函数pure_virtual_called()，如果错误调用程序就会直接结束
 
-![image-20231207161444292](C:\Users\Vica\AppData\Roaming\Typora\typora-user-images\image-20231207161444292.png)
+![image-20231207161444292](image-20231207161444292.png)
 
 每个虚函数同时会被分配一个索引值，通过该索引值查找虚函数表以实现动态绑定。同时，虚表一般都是在对象内存布局中的起始位置
 
@@ -269,7 +269,7 @@ override是重载，这些⽅法的名称相同⽽参数形式不同。
 
 6.new操作符从⾃由存储区上为对象动态分配内存空间，⽽malloc函数从堆上动态分配内存
 
-![image-20231208133520854](C:\Users\Vica\AppData\Roaming\Typora\typora-user-images\image-20231208133520854.png)
+![image-20231208133520854](image-20231208133520854.png)
 
 ### 6.constexpr/const
 
@@ -295,7 +295,7 @@ constexpr的优势：
 
 ### 7.static/const
 
-<img src="C:\Users\Vica\AppData\Roaming\Typora\typora-user-images\image-20231208134831348.png" alt="image-20231208134831348" style="zoom:150%;" />
+<img src="image-20231208134831348.png" alt="image-20231208134831348" style="zoom:150%;" />
 
 static实现多个对象之间的数据共享和隐藏，默认初始化为0。
 
@@ -633,7 +633,7 @@ Test 4——篡改了动态内存区的内容。在free(str)后，str成为了�
 
 ### 3.进程地址空间的具体分布
 
-![image-20231210130504038](C:\Users\Vica\AppData\Roaming\Typora\typora-user-images\image-20231210130504038.png)
+![image-20231210130425098](image-20231210130425098.png)
 
 命令行参数与环境变量——命令执行程序的时候给程序的参数
 
