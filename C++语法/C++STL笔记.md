@@ -268,15 +268,21 @@ hashtable中的bucket所维护的list既不是list也不是slist，而是其自�
 
 traits技法利用“内嵌型别“的编程技巧与**编译器的template参数推导功能**，增强C++未能提供的关于型别认证方面的能力。常用的有iterator_traits和type_traits。
 
+对于Non class(iterators) iterators而言，输入的是native pointer（指针）并不是一个类（输入的是容器的指针而不是容器本体），此时是一个退化的指针，不能直接回答算法的提问。因此必须必须使用Traits来提取这些特征。
+
+<img src="image-20240123201916700.png" alt="image-20240123201916700" style="zoom:67%;" />
+
 iterator_traits：被称为**特性萃取机**，能够方便的让外界获取以下5种型别：
 
 - value_type：迭代器所指对象的型别
-- difference_type：两个迭代器之间的距离
+- difference_type：两个迭代器之间距离的type
 - pointer：迭代器所指向的型别
 - reference：迭代器所引用的型别
 - iterator_category：input，output，forward，bidrectional，random access
 
-type_traits：关注的是**型别的特性**，例如这个型别是否具备non-trivial defalt ctor（默认构造函数）、non-trivial copy ctor（拷贝构造函数）、non-trivial assignment operator（赋值运算符） 和non-trivial dtor（析构函数），如果答案是否定的，可以采取直接操作内存的方式提高效率
+type_traits：关注的是**型别的特性**，例如这个型别是否具备non-trivial defalt ctor（默认构造函数）、non-trivial copy ctor（拷贝构造函数）、non-trivial assignment operator（赋值运算符） 和non-trivial dtor（析构函数），如果答案是否定的，可以采取直接操作内存的方式提高效率。
+
+除了上述两种traits之外，还有：
 
 ### STL的两级空间配置器
 
