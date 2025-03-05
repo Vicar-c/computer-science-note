@@ -1,5 +1,7 @@
 # 目录
 
+建议使用链接阅读 [Gitbook链接](https://244100401s-organization.gitbook.io/vicar-cs-organization)
+
 计算机基础：
 
 [操作系统](ji-suan-ji-ji-chu/cao-zuo-xi-tong.md)
