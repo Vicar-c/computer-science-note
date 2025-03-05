@@ -24,5 +24,3 @@
   * [计算机网络](ji-suan-ji-ji-chu/ji-suan-ji-wang-luo.md)
   * [设计模式](ji-suan-ji-ji-chu/she-ji-mo-shi.md)
   * [音视频编码与协议](ji-suan-ji-ji-chu/yin-shi-pin-bian-ma-yu-xie-yi.md)
-* [项目相关](xiang-mu-xiang-guan/README.md)
-  * [A Tiny Webserver](xiang-mu-xiang-guan/webserver-xiang-mu-xi-jie.md)
