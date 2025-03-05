@@ -1,51 +1,47 @@
-## 目录  
+# 目录
 
-计算机基础：  
+计算机基础：
 
-[操作系统](计算机基础/操作系统.md)  
+[操作系统](ji-suan-ji-ji-chu/cao-zuo-xi-tong.md)
 
-[MySQL](计算机基础/MySQL.md)  
+[MySQL](ji-suan-ji-ji-chu/mysql.md)
 
-[Redis](计算机基础/Redis.md)  
+[Redis](ji-suan-ji-ji-chu/redis.md)
 
-[计算机系统](计算机基础/计算机系统.md)  
+[计算机系统](ji-suan-ji-ji-chu/ji-suan-ji-xi-tong.md)
 
-[计算机网络](计算机基础/计算机网络.md)  
+[计算机网络](ji-suan-ji-ji-chu/ji-suan-ji-wang-luo.md)
 
-[设计模式](计算机基础/设计模式.md)  
+[设计模式](ji-suan-ji-ji-chu/she-ji-mo-shi.md)
 
-[音视频编码与协议](计算机基础/音视频编码与协议.md)  
+[音视频编码与协议](ji-suan-ji-ji-chu/yin-shi-pin-bian-ma-yu-xie-yi.md)
 
-[FFmpeg](计算机基础/FFmpeg.md)  
+[FFmpeg](ji-suan-ji-ji-chu/ffmpeg.md)
 
-[Linux内核](计算机基础/Linux内核设计.md)  
+[Linux内核](ji-suan-ji-ji-chu/linux-nei-he-she-ji.md)
 
-[WebRTC](计算机基础/WebRTC.md)  
+[WebRTC](ji-suan-ji-ji-chu/webrtc.md)
 
-[gdb与Linux命令](计算机基础/gdb与Linux命令.md)  
+[gdb与Linux命令](ji-suan-ji-ji-chu/gdb-yu-linux-ming-ling.md)
 
+C++语法：
 
+[C++STL](c++-yu-fa/c++stl-bi-ji.md)
 
-C++语法：  
+[C++基础](c++-yu-fa/c++-ji-chu-bi-ji.md)
 
-[C++STL](C++语法/C++STL笔记.md)  
+[C++新特性](c++-yu-fa/c++-xin-te-xing.md)
 
-[C++基础](C++语法/C++基础笔记.md)  
+[EffectiveC++](c++-yu-fa/effectivec++.md)
 
-[C++新特性](C++语法/C++新特性.md)  
+[EffectiveSTL](c++-yu-fa/effectivestl.md)
 
-[EffectiveC++](C++语法/EffectiveC++.md)  
+云与分布式：
 
-[EffectiveSTL](C++语法/EffectiveSTL.md)  
+[Docker](yun-yu-fen-bu-shi/docker.md)
 
+[K8s](yun-yu-fen-bu-shi/k8s.md)
 
-云与分布式：  
-
-[Docker](云与分布式/Docker.md)  
-
-[K8s](云与分布式/K8S.md)  
-
-[Go](云与分布式/go.md)   **施工中**   
+[Go](yun-yu-fen-bu-shi/go.md) **施工中**
 
 分布式相关知识等
-
