@@ -2,6 +2,8 @@
 
 支持在线阅读 [Gitbook链接](https://244100401s-organization.gitbook.io/computer-science-note/)
 
+善用gitbook搜索功能，英文关键字更容易搜索成功
+
 计算机基础：
 
 [操作系统](ji-suan-ji-ji-chu/cao-zuo-xi-tong.md)
