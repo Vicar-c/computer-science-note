@@ -1,6 +1,6 @@
-# 目录
+# README
 
-支持在线阅读   [Gitbook链接](https://244100401s-organization.gitbook.io/vicar-cs-organization)
+支持在线阅读 [Gitbook链接](https://244100401s-organization.gitbook.io/computer-science-note/)
 
 计算机基础：
 
