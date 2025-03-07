@@ -12,7 +12,7 @@
 
 5.简单，仅仅25个关键字，内嵌c语言语法支持，包含面向对象特征，同时跨平台
 
-## golong适合场景
+## golang适合场景
 
 云计算基础设施：docker，kubernetes，etcd，consul，cloudflare CDN，七牛云存储等
 
