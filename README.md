@@ -4,6 +4,10 @@
 
 善用gitbook搜索功能，英文关键字更容易搜索成功
 
+技术栈：Linux，C++，Go，计算机基础，一点点音视频/云原生/分布式
+
+未来希望加入的：自建Leetcode经典题目，服务端架构/组件相关，代表性的C++小组件实现（LLM，python相关额外建一个库）
+
 计算机基础：
 
 [操作系统](ji-suan-ji-ji-chu/cao-zuo-xi-tong.md)
