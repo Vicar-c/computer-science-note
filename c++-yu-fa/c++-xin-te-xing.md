@@ -1,4 +1,4 @@
-# C++新特性
+# C++ 新特性
 
 ## C++新特性
 
@@ -482,3 +482,822 @@ template<> cklass tuple<> {}; // 边界
 偏特化版本为双参数的tuple版本，该偏特化版本包含了两个参数，一个是类型模版参数Head，另一个是模版参数包Tail。在另一个版本的实现中，将Head型的数据作为tuple\<Head, Tail…>的第一个成员，而将使用包扩展表达式的模版类tuple\<Tail…>作为tuple\<Head,Tail…>的私有基类。这样一来，当需要实例化一个形如tuple\<double, int, char, float>的类型时，则会引起基类的递归构造，这样的递归构造在tuple的参数包为0的时候会结束。即先从tuple<>构造出tuple< float >，继而分别造出tuple\<char, float>，tuple\<int, char, float>，最后建造出tuple\<double, int, char, float>
 
 ![image-20240123201141535](../.gitbook/assets/image-20240123201141535.png)
+
+## C++14新特性
+
+### 函数返回值推导
+
+可以用auto作为返回类型，除了普通函数外也可以用在模版中
+
+```c++
+PS：
+1.函数内如果有多个return语句，它们必须返回相同的类型，否则编译失败
+
+2.如果return语句返回初始化列表，返回值类型推导会失败
+
+3.如果函数是虚函数，不能使用返回值类型推导
+
+4.返回类型推导可以用在前向声明中，但是在使用它们之前，翻译单元中必须能够得到函数定义
+auto f();               // declared, not yet defined
+auto f() { return 42; } // defined, return type is int
+
+int main() {
+    cout << f() << endl;
+}
+
+5.返回类型推导可以用在递归函数中，但是递归调用必须以至少一个返回语句作为先导，以便编译器推导出返回类型
+auto sum(int i) {
+    if (i == 1)
+        return i;              // return int
+    else
+        return sum(i - 1) + i; // ok
+}
+
+```
+
+### lambda参数auto
+
+在C++11中，lambda表达式参数需要使用具体的类型声明，而C++14中的表达式参数可以直接是auto
+
+```c++
+auto f = [] (auto a) { return a; };
+cout << f(1) << endl;
+cout << f(2.3f) << endl;
+```
+
+### 变量模版
+
+变量模版主要是为了解决C++14之前不允许使用模板声明的方式声明一个变量
+
+```c++
+template<class T>
+constexpr T pi = T(3.1415926535897932385L); // C++14
+
+int main() {
+    cout << pi<int> << endl; // 3
+    cout << pi<double> << endl; // 3.14159
+    return 0;
+}
+```
+
+### 别名模版
+
+在C++11就已经引入类型别名，形如：using newtype = oldtype
+
+而类型别名可以加上模版参数形成别名模版：
+
+```c++
+template<typename T, typename U>
+struct A {
+    T t;
+    U u;
+};
+
+template<typename T>
+using B = A<T, int>;
+```
+
+至此，C++14支持的模版形式为四种——函数模版，类模版，变量模版，别名模版
+
+### 扩大constexpr的使用范围
+
+在C++14中constexpr可以使用局部变量和循环
+
+### \[\[deprecated]]标记
+
+C++14中增加了deprecated标记，修饰类、变、函数等，当程序中使用到了被其修饰的代码时，编译时被产生警告，用户提示开发者该标记修饰的内容将来可能会被丢弃，尽量不要使用。
+
+### 二进制字面量与整形字面量分隔符
+
+二进制字面值：二进制字面值可以使用0b或者0B开头来表示
+
+数位分割符：冗长的符号可以每隔一定位分割进行标记（可以在任意字面量嵌入以提高可读性）
+
+```c++
+int a = 0b0001'0011'1010;
+double b = 3.14'1234'1234'1234;
+```
+
+### std::make\_unique
+
+使用上和std::make\_shared一致
+
+### std::shared\_timed\_mutex与std::shared\_lock
+
+C++14通过std::shared\_timed\_mutex和std::shared\_lock来实现读写锁，保证多个线程可以同时读，但是写线程必须独立运行，写操作不可以同时和读操作一起进行。
+
+### std::integer\_sequence
+
+* std::integer\_sequence\<T,N...>其辅助类模板为std::make\_integer\_sequence\<T,N>，两者的数据类型通常是int，long，float、double、size\_t.
+* std::index\_sequence是std::integer\_sequence\<std::size\_t, N...>的一个特殊别名：其数据类型限定为size\_t,对应的辅助类模板为std::make\_index\_sequence< N >。
+
+```c++
+template<typename T, T... ints>
+void print_sequence(std::integer_sequence<T, ints...> int_seq)
+{
+    std::cout << "The sequence of size " << int_seq.size() << ": ";
+    ((std::cout << ints << ' '), ...);
+    std::cout << '\n';
+}
+
+int main() {
+    print_sequence(std::integer_sequence<int, 9, 2, 5, 1, 9, 1, 6>{});
+    return 0;
+}
+
+输出：7 9 2 5 1 9 1 6
+// 接受一个索引序列 Is...，一个函数 f 和一个 std::tuple 类型的对象 t。它使用 std::get<Is>(t) 从元组 t 中获取元素，并对每个元素应用函数 f。最后，它使用 std::make_tuple 将应用函数 f 后的元素组合成一个新的 std::tuple 并返回。
+template <std::size_t... Is, typename F, typename T>
+auto map_filter_tuple(F f, T& t) {
+    return std::make_tuple(f(std::get<Is>(t))...);
+}
+
+// 与上一个版本类似，但它接受一个额外的参数 std::index_sequence<Is...>。这个参数用于在编译时生成一个索引序列，以便在 std::make_tuple 中正确地展开元组 t 的元素。
+template <std::size_t... Is, typename F, typename T>
+auto map_filter_tuple(std::index_sequence<Is...>, F f, T& t) {
+    return std::make_tuple(f(std::get<Is>(t))...);
+}
+
+// 接受一个类型 S（通常是 std::index_sequence 的别名），一个函数 f 和一个 std::tuple 类型的对象 t。它首先创建一个与 t 大小相同的索引序列 S{}，然后调用第二个版本的 map_filter_tuple 函数，将索引序列、函数 f 和元组 t 作为参数传递。
+template <typename S, typename F, typename T>
+auto map_filter_tuple(F&& f, T& t) {
+    return map_filter_tuple(S{}, std::forward<F>(f), t);
+}
+```
+
+### std::exchange
+
+std::exchange使用上和swap类似，但实现上并不是通过像swap通过转移对象实现，而是直接将一个对象的值替换为另一个的值，类似于赋值操作，但它返回被替换的值。
+
+```c++
+int main() {
+    std::vector<int> v;
+    std::exchange(v, {1,2,3,4});
+    cout << v.size() << endl;
+    for (int a : v) {
+        cout << a << " ";
+    }
+    return 0;
+}
+```
+
+### std::quoted
+
+C++14引入std::quoted用于给字符串添加双引号
+
+```c++
+int main() {
+    string str = "hello world";
+    cout << str << endl;
+    cout << std::quoted(str) << endl;
+    return 0;
+}
+```
+
+## C++ 17新特性
+
+### Nested Namespace（namespace嵌套）
+
+```c++
+namespace a::b::c {}
+```
+
+在C++17前需要使用大括号嵌套
+
+```c++
+namespace a {
+	namespace b {
+		namespace c {
+		
+		}
+	}
+}
+```
+
+### Variable declaration in if and switch（在if和else中声明变量）
+
+if和else中声明变量有助于避免在多个同级判断时需要初始化不同名称的变量，即内联变量
+
+### IF constexpr statement（if的constexpr表达式，即条件编译指令）
+
+if constexpr是编译时运行，因此可以加快模版的运行处理（即编译器在编译时根据条件选择性地编译代码）
+
+```c++
+#include<iostream>
+#include<type_traits>
+
+template<typename T>
+void printType() {
+    if constexpr (std::is_integral<T>::value) {
+        std::cout<< "Integral type"<< std::endl;
+    } else if constexpr (std::is_floating_point<T>::value) {
+        std::cout<< "Floating point type"<< std::endl;
+    } else {
+        std::cout<< "Other type"<< std::endl;
+    }
+}
+
+int main() {
+    printType<int>(); // 输出 "Integral type"
+    printType<double>(); // 输出 "Floating point type"
+    printType<std::string>(); // 输出 "Other type"
+
+    return 0;
+}
+```
+
+### Structure Bindings（结构体绑定）
+
+通过结构化绑定，对于tuple、map等类型，获取相应值会方便很多（即直接获得对象内部的内容）
+
+```c++
+ map<int, string> m = {
+      {0, "a"},
+      {1, "b"},  
+    };
+for (const auto &[i, s] : m) {
+    cout << i << " " << s << endl;
+}
+```
+
+结构化绑定还可以通过引用改变对象的值，使用引用即可
+
+```c++
+int main() {
+    std::pair a(1, 2.3f);
+    auto& [i, f] = a;
+    i = 2;
+    cout << a.first << endl; // 2 
+}
+```
+
+结构化绑定不止可以绑定pair和tuple，还可以绑定数组和结构体等，甚至是自定义类的结构化绑定。
+
+对于自定义类，需要实现相关的tuple\_size和tuple\_element和get< N >方法\*\*（理解上存在困难，需要补充）\*\*
+
+### Folding Expression（折叠表达式）
+
+C++17引入了折叠表达式使可变参数模板编程更方便：
+
+```c++
+// C++17
+template <typename ... Ts>
+auto sum(Ts ... ts) {
+    return (ts + ...);
+}
+int a {sum(1, 2, 3, 4, 5)}; // 15
+std::string a{"hello "};
+std::string b{"world"};
+cout << sum(a, b) << endl; // hello world
+
+template<typename T1, typename... T>
+auto C11_sum(T1 s, T... ts)
+{
+    return s + C11_sum(ts...);
+}
+```
+
+### Direct List Initialization of enums（枚举类型的列表初始化）
+
+C++17开始支持enum类型的初始化
+
+```c++
+enum byte : unsigned char {}; 
+byte b {0}; // OK 
+byte c {-1}; // ERROR 
+byte d = byte{1}; // OK 
+byte e = byte{256}; // ERROR 
+```
+
+### 构造函数模版推板
+
+C++17不需要特殊指定，直接就可以推导出模版类型
+
+```c++
+pair<int, double> p(1, 2.2); // before c++17
+pair p(1, 2.2); // c++17 自动推导
+```
+
+### 内联变量
+
+```c++
+C++17前只有内联函数，现在有了内联变量
+例如：C++类的静态成员变量在头文件中是不能初始化的，但是有了内联变量，就可以达到此目的：
+// header file
+struct A {
+    static const int value;  
+};
+inline int const A::value = 10;
+
+// ==========或者========
+struct A {
+    inline static const int value = 10;
+}
+```
+
+### \_\_has\_include 预处理表达式
+
+可以判断**是否可以包含**某个头文件，代码可能会在不同编译器下工作，不同编译器的可用头文件不同
+
+简单来说就是考虑兼容性判断
+
+```c++
+#if defined __has_include
+#if __has_include(<charconv>)  
+// 如果<charconv>头文件可以被包含，那么has_charconv宏将被定义为1，并且<charconv>头文件将被包含
+#define has_charconv 1
+#include <charconv>
+#endif
+#endif
+```
+
+### lambda表达式用\*this捕获对象副本
+
+当捕获对象是\*this时，并不会持有this指针，而是直接持有对象的拷贝，这样它的生命周期就与对象的生命周期不相关
+
+```c++
+struct A {
+    int a;
+    void func() {
+        auto f = [*this] { // 这里
+            cout << a << endl;
+        };
+        f();
+    }  
+};
+int main() {
+    A a;
+    a.func();
+    return 0;
+}
+```
+
+### 新增Attribute
+
+C++11和C++14已经可以更方便的使用attribute
+
+```c++
+void fatal() __attribute__((noreturn)); // before C++11
+
+// C++11 and C++14
+[[carries_dependency]] 让编译期跳过不必要的内存栅栏指令
+[[noreturn]] 函数不会返回
+[[deprecated]] 函数将弃用的警告
+
+[[noreturn]] void terminate() noexcept;
+[[deprecated("use new func instead")]] void func() {}
+```
+
+C++17又增加了三个
+
+```c++
+[[fallthrough]]:用在switch中提示可以直接落下去，不需要break，让编译期忽略警告
+    switch (value) {
+        case 1:
+            std::cout << "Value is 1."<< std::endl;
+            [[fallthrough]];
+        case 2:
+            std::cout << "Value is 2."<< std::endl;
+            break;
+        case 3:
+            std::cout << "Value is 3."<< std::endl;
+            break;
+        default:
+            std::cout << "Value is not 1, 2, or 3."<< std::endl;
+            break;
+    }
+[[nodiscard]]:表示修饰的内容不能被忽略，可用于修饰函数，标明返回值一定要被处理
+[[nodiscard]] int func();
+void F() {
+    func(); // warning 没有处理函数返回值
+}
+[[maybe_unused]] ：提示编译器修饰的内容可能暂时没有使用，避免产生警告
+void func1() {}
+[[maybe_unused]] void func2() {} // 警告消除
+void func3() {
+    int x = 1;
+    [[maybe_unused]] int y = 2; // 警告消除
+}
+```
+
+### 字符串转换
+
+新增from\_chars函数和to\_chars函数
+
+std::from\_chars 函数用于从字符序列中解析数值。它接受一个字符范围（由开始和结束迭代器定义），并尝试将该范围内的字符解析为指定类型的数值。
+
+如果解析成功，函数将返回一个包含解析后的数值和剩余未解析字符的迭代器的结果对。如果解析失败，函数将返回一个包含错误信息的结果对。
+
+```c++
+#include<iostream>
+#include<charconv>
+
+int main() {
+    std::string str = "123abc";
+    int value;
+    auto result = std::from_chars(str.data(), str.data() + str.size(), value);
+
+    if (result.ec == std::errc()) {
+        std::cout << "Parsed value: "<< value<< std::endl;
+        std::cout << "Remaining characters: "<< std::string(result.ptr, str.data() + str.size())<< std::endl;
+    } else {
+        std::cout << "Parsing failed."<< std::endl;
+    }
+
+    return 0;
+}
+```
+
+std::to\_chars 函数用于将数值格式化为字符序列。它接受一个字符范围（由开始和结束迭代器定义），并尝试将指定类型的数值格式化为该范围内的字符。
+
+如果格式化成功，函数将返回一个指向格式化后的字符序列末尾的迭代器。如果格式化失败（例如，提供的字符范围太小），函数将返回一个指向字符范围开始的迭代器。
+
+```c++
+#include<iostream>
+#include<charconv>
+
+int main() {
+    int value = 12345;
+    char buffer[20];
+    auto result = std::to_chars(buffer, buffer + sizeof(buffer), value);
+
+    if (result != buffer) {
+        // 注意此时可以通过char[]和末尾迭代器作为string的构造参数
+        std::cout << "Formatted value: "<< std::string(buffer, result)<< std::endl;
+    } else {
+        std::cout << "Formatting failed."<< std::endl;
+    }
+
+    return 0;
+}
+```
+
+### std::variant
+
+std::variant实现类似union的功能（类型安全的union），但里面允许的类型更多，包括std::string，map等。
+
+```c++
+v.index() //返回变体类型 v 实际所存放数据的类型的下标
+std::holds_alternative<T>(v) //可查询变体类型 v 是否存放了 T 类型的数据
+    
+std::get<I>(v) //如果变体类型 v 存放的数据类型下标为 I，那么返回所存放的数据，否则报错
+std::get_if<I>(&v) //如果变体类型 v 存放的数据类型下标为 I，那么返回所存放数据的指针，否则返回空指针
+    
+std::get<T>(v) //如果变体类型 v 存放的数据类型为 T，那么返回所存放的数据，否则报错
+std::get_if<T>(&v) //如果变体类型 v 存放的数据类型为 T，那么返回所存放数据的指针，否则返回空指针
+
+std::visit(f, v) //将变体类型 v 所存放的数据作为参数传给函数 f。
+std::visit(f, v, u) //将变体类型 v, u 所存放的数据作为参数传给函数 f。
+```
+
+visit函数部分直接写函数名即可
+
+注意，一般情况下variant的第一个类型一般要有对应的构造函数，否则编译失败（这个构造函数还必须是默认构造函数，如果不是默认的话还是错误）
+
+如果想要避免这种情况，可以使用**std::monostate**来打个桩，模拟一个空状态
+
+```c++
+std::monostate是一种特殊类型，主要用于作为标记类型（tag type）或占位类型（placeholder type）。它被设计为一个不占用任何空间的类型，用于表示“不包含实际数据”的状态。
+这种类型通常在函数签名中作为占位符，用于表示某个函数不接受任何参数或不返回任何数据。
+
+std::variant<int, std::monostate> getInteger(bool condition) {
+if (condition) {
+    return 42;
+  } else {
+    return std::monostate{};
+  }
+}
+
+```
+
+### std::optional
+
+在C++17之前，如果可能返回空对象，最好使用智能指针包裹返回，现在则可以使用std::optional实现
+
+std::optional不仅能把对象作为模版类型，还可以把基本类型作为模版类型
+
+返回为空时是std::nullopt
+
+### std::any
+
+std::any可以存储任何类型的单个值
+
+```
+std::any a = 1;
+cout << a.type().name() << " " << std::any_cast<int>(a) << endl;
+```
+
+any的核心在于即便更改类型，我们仍然可以将其视为类型安全（void\*则不行），因为失败他会抛出bad\_anycast异常
+
+std::any 主要依赖 类型擦除（Type Erasure） 技术来捕获和存储不同类型的数据，它的实现依赖基类 + 模板派生类的方式来存储不同类型的数据，并通过基类提供统一的接口。
+
+在 std::any 的构造函数中，它会根据输入类型T创建 holder\<T>实例，并将其存储在ptr中，这样就实现了获取
+
+### std::apply
+
+std::apply可以将tuple展开作为函数的参数输入，具体来说，只要是可以通过std::get来操作成员的元组容器（std::pair，atd::array，std::tuple），都可以通过std::apply展开。
+
+之前，如果想要展开，需要首先实现一个sequence，里面是从0到size，分别对应`tuple`中的每一个参数，然后再通过`std::get`和折叠展开语法来把tuple中的数据展开到参数列表中。
+
+C++17使用std::apply实现的效果如下：
+
+```c++
+#include <iostream>
+
+int sum(int a, int b, int c) {
+    return a + b + c;
+}
+
+int main(int argc, const char *argv[]) {
+    std::tuple tu(1, 2, 3);
+    // 注意这里展开的参数数量必须要与函数需要输入的参数一致，否则编译错误
+    int res = std::apply(sum, std::move(tu));
+    std::cout << res << std::endl; // 输出6
+    return 0;
+}
+```
+
+除了普通函数，apply的第一个参数还可以是函数指针、lambda、仿函数对象，对于非静态函数成员，它需要在第一个参数把调用的对象函数引用输入。
+
+```c++
+#include <iostream>
+struct TT {
+    int sum(int a, int b, int c) {
+        return a + b + c;
+    }
+};
+
+int main(int argc, const char *argv[]) {
+    std::tuple tu(TT(), 1, 2, 3); // 第一个成员就是调用成员
+    int res = std::apply(&TT::sum, std::move(tu)); // 这里传成员函数指针
+    // 效果相当于std::get<0>(tu).sum(1, 2, 3)
+    std::cout << res << std::endl;
+    return 0;
+}
+
+```
+
+如果要考虑到使用apply让tuple在变参模版中展开，需要使用lambda
+
+```c++
+#include <iostream>
+
+template <typename... T>
+void test(T... arg) {
+    (std::cout << ... << arg) << std::endl;
+}
+
+int main(int argc, const char *argv[]) {
+    std::tuple tu(1, 2.5, "abc");
+    std::apply([](auto &&... args) {return test(args...);}, std::move(tu)); // 正常调用
+    return 0;
+}
+
+```
+
+### std::make\_from\_tuple
+
+主要是解决std::apply无法获得构造函数的函数指针（构造后才能有指针）的问题
+
+```c++
+#include <iostream>
+
+class Test {
+public:
+    Test(int a, double b, const std::string &c): a_(a), b_(b), c_(c) {}
+    void show() const {std::cout << a_ << " " << b_ << " " << c_ << std::endl;}
+private:
+    int a_;
+    double b_;
+    std::string c_;
+};
+
+int main(int argc, const char *argv[]) {
+    std::tuple tu(1, 2.5, "abc");
+    Test &&t = std::make_from_tuple<Test>(std::move(tu));
+    t.show();
+    return 0;
+}
+
+```
+
+### std::string\_view
+
+通常我们传递一个string时会触发对象的拷贝操作，大字符串的拷贝赋值操作会触发堆内存分配，很影响运行效率，有了string\_view就可以避免拷贝操作，平时传递过程中传递string\_view即可。
+
+string\_view不涉及所有权的转移，即与std::move的关系不大，它只是提供了一种轻量级的字符串引用方式，可以在不拷贝字符串内容的情况下共享字符串数据，即“string视图”（不能修改，只是查看）
+
+```c++
+void func(std::string_view stv) { cout << stv << endl; }
+
+int main(void) {
+    std::string str = "Hello World";
+    std::cout << str << std::endl;
+
+    std::string_view stv(str.c_str(), str.size());
+    cout << stv << endl;
+    func(stv);
+    return 0;
+}
+```
+
+### as\_const
+
+C++17使用as\_const可以将左值转成const类型
+
+```c++
+std::string str = "str";
+const std::string& constStr = std::as_const(str);
+```
+
+### file\_system
+
+std::fieldsystem基本囊括了关于文件的大部分功能
+
+```c++
+#include <filesystem>
+
+// 主要包括以下几个类
+1.path 文件路径
+2.directory_entry 文件入口
+3.directory_iterator 获取文件系统目录中文件的迭代器容器，其元素为 directory_entry 对象
+4.file_status 用于获取和修改文件（或目录）的属性
+    
+// 常用的几个函数
+fs::create_directory(dir_path);
+fs::copy_file(src, dst, fs::copy_options::skip_existing);
+fs::exists(filename);
+fs::current_path(err_code);
+```
+
+### std::shared\_mutex
+
+适用场景：一个或多个读线程同时读取共享资源，且只有一个写线程来修改这个资源
+
+但一般不直接调用unlock/lock函数进行加锁/解锁，而是结合std::lock\_guard和std::shared\_lock一起使用
+
+下面测试用例中时间消耗大概减少了一半
+
+```c++
+#include "stdafx.h"
+#include <mutex>
+#include <shared_mutex>
+#include <thread>
+#include <list>
+#include <iostream>
+#include <vector>
+ 
+#define READ_THREAD_COUNT 8  
+#define LOOP_COUNT 5000000  
+ 
+typedef std::shared_lock<std::shared_mutex> ReadLock;
+typedef std::lock_guard<std::shared_mutex> WriteLock;
+typedef std::lock_guard<std::mutex> NormalLock;
+ 
+class shared_mutex_counter {
+public:
+    shared_mutex_counter() = default;
+ 
+    unsigned int get() const {
+        ReadLock lock(mutex);
+        return value;
+    }
+ 
+    void increment() {
+        WriteLock lock(mutex);
+        value++;
+    }
+ 
+private:
+    mutable std::shared_mutex mutex;
+    unsigned int value = 0;
+};
+ 
+class mutex_counter {
+public:
+    mutex_counter() = default;
+ 
+    unsigned int get() const {
+        NormalLock lock(mutex);
+        return value;
+    }
+ 
+    void increment() {
+        NormalLock lock(mutex);
+        value++;
+    }
+ 
+private:
+    mutable std::mutex mutex;
+    unsigned int value = 0;
+};
+ 
+class timers
+{
+public:
+    timers()
+    {
+        m_begin = std::chrono::high_resolution_clock::now();
+    }
+ 
+    ~timers()
+    {
+        m_end = std::chrono::high_resolution_clock::now();
+        Consuming();
+    }
+ 
+    void Consuming()
+    {
+        std::cout << "Time-consuming:" << std::chrono::duration_cast<std::chrono::duration<float, std::milli>>(m_end - m_begin).count() << std::endl;
+    }
+ 
+private:
+    std::chrono::high_resolution_clock::time_point m_begin;
+    std::chrono::high_resolution_clock::time_point m_end;
+};
+ 
+ 
+void test_shared_mutex()
+{
+    shared_mutex_counter counter;
+    unsigned int temp;
+ 
+    auto writer = [&counter]() {
+        for (unsigned int i = 0; i < LOOP_COUNT; i++){
+            counter.increment();
+        }
+    };
+ 
+    auto reader = [&counter, &temp]() {
+        for (unsigned int i = 0; i < LOOP_COUNT; i++) {
+            temp = counter.get();
+        }
+    };
+ 
+    std::cout << "----- shared mutex test ------" << std::endl;
+    std::list<std::shared_ptr<std::thread>> threadlist;
+    {
+        timers timer;
+ 
+        for (int i = 0; i < READ_THREAD_COUNT; i++)
+        {
+            threadlist.push_back(std::make_shared<std::thread>(reader));
+        }
+        std::shared_ptr<std::thread> pw = std::make_shared<std::thread>(writer);
+ 
+        for (auto &it : threadlist)
+        {
+            it->join();
+        }
+        pw->join();
+    }
+    std::cout <<"count:"<< counter.get() << ", temp:" << temp << std::endl;
+}
+ 
+void test_mutex()
+{
+    mutex_counter counter;
+    unsigned int temp;
+ 
+    auto writer = [&counter]() {
+        for (unsigned int i = 0; i < LOOP_COUNT; i++) {
+            counter.increment();
+        }
+    };
+ 
+    auto reader = [&counter, &temp]() {
+        for (unsigned int i = 0; i < LOOP_COUNT; i++) {
+            temp = counter.get();
+        }
+    };
+ 
+    std::cout << "----- mutex test ------" << std::endl;
+    std::list<std::shared_ptr<std::thread>> threadlist;
+    {
+        timers timer;
+ 
+        for (int i = 0; i < READ_THREAD_COUNT; i++)
+        {
+            threadlist.push_back(std::make_shared<std::thread>(reader));
+        }
+ 
+        std::shared_ptr<std::thread> pw = std::make_shared<std::thread>(writer);
+ 
+        for (auto &it : threadlist)
+        {
+            it->join();
+        }
+        pw->join();
+    }
+    std::cout << "count:" << counter.get() << ", temp:" << temp << std::endl;
+}
+ 
+ 
+ 
+int main()
+{
+    test_shared_mutex();
+    test_mutex();
+    return 0;
+}
+```
