@@ -46,6 +46,6 @@ C++语法：
 
 [K8s](yun-yu-fen-bu-shi/k8s.md)
 
-[Go](yun-yu-fen-bu-shi/go.md) **施工中**
+[Go](yun-yu-fen-bu-shi/go.md)&#x20;
 
-分布式相关知识等
+其他的正在迁移中
